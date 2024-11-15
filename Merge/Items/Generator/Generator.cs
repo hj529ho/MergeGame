@@ -101,40 +101,7 @@ namespace Merge.Items
 
         private void SellItem()
         {
-            Managers.Analytics.SendEventNoParameter(AnalyticsManager.DefaultAnalytics.click_sell_item); // 믹스패널 이벤트
-
             Managers.Game.Coin += ItemData.coin / 10;
-            Managers.UI.MakeRewardParticle(transform,
-                new RewardData("Coin", true, ItemData.coin / 100 < 1 ? 1 : ItemData.coin / 100));
-            var effect = Managers.Resource.Load<GameObject>("Prefabs/Effect/Eat_Item_White_1.prefab");
-            var go = Managers.Pool.Pop(effect);
-            Managers.Game.TempGeneratorEnergy = ExtraData;
-            go.transform.position = transform.position;
-            Managers.Game.ItemActionButtonComponent.SetButton(ItemActionButton.ButtonType.Text, "실행취소");
-            Managers.Game.ItemAction = () =>
-            {
-                var item = Managers.Game.GenerateItemOnGrid(ItemData, MergeEventHandler.OriginGrid, 60);
-                var rectTransform = item.GetComponent<RectTransform>();
-                rectTransform.sizeDelta = new Vector2(100, 100);
-                rectTransform.DOSizeDelta(new Vector2(140, 140), 0.3f).SetEase(Ease.OutBack);
-                Managers.Game.ItemActionButtonComponent.SetButton(ItemActionButton.ButtonType.TextCoin, "판매",
-                    $"{ItemData.coin / 10}");
-                MergeEventHandler.OriginGrid.Item = item;
-                Managers.Game.Coin -= ItemData.coin / 10;
-                item.ExtraData = Managers.Game.TempGeneratorEnergy;
-                MergeEventHandler.Game.TempGeneratorEnergy = 0;
-                var buttonAction = item.GetComponent<IClickActionButtonHandler>();
-                MergeEventHandler.Game.ItemAction = buttonAction == null ? null : buttonAction.OnClickActionButton;
-            };
-            if (SceneManager.GetActiveScene().name == "MergeScene")
-            {
-                foreach (var baseItem in MergeEventHandler.Game.ActiveItems.FindAll(x => x != this))
-                {
-                    baseItem.MergeEventHandler.StateReset();
-                    baseItem.transform.position = baseItem.MergeEventHandler.OriginGrid.transform.position;
-                }
-            }
-
             MergeEventHandler.OriginGrid.Item = null;
             MergeEventHandler.Game.DestroyItem(this);
             MergeEventHandler.Game.Save();
