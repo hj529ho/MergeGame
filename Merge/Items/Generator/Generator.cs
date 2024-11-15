@@ -36,7 +36,6 @@ namespace Merge.Items
                     Managers.UI.ShowPopupUI<UI_EnergyBuyPopup>();
                 return;
             }
-
             // 아이템 데이터에서 아이템을 랜덤으로 뽑아서 생성하는 로직입니다.
             var pickedData = Utils.WeightRandom(ItemData.itemsThemeDatas);
             if ((object)Managers.Game.GenerateItemOnRandomGrid(pickedData, transform.position, 60, null) != null)
@@ -60,9 +59,6 @@ namespace Merge.Items
     
         public void OnSelectItem()
         {
-            if (SceneManager.GetActiveScene().name == "TutorialMergeScene")
-                return;
-
             isClicked = false;
             Managers.Game.ItemNameText = ItemData.GetName();
             Managers.Game.ItemLevelText = $"Lv.{ItemData.level}";
@@ -70,33 +66,8 @@ namespace Merge.Items
                 Managers.Game.FlavorText = Managers.Localization.GetString("다음 아이템으로 합성 가능", "FlavorTextTable");
             else
                 Managers.Game.FlavorText = Managers.Localization.GetString("최대 레벨 달성!", "FlavorTextTable");
-
-            Managers.Game.ItemCountText =
-                $"{ExtraData / ItemData.spendEnergy}/{ItemData.maxEnergy / ItemData.spendEnergy}";
-
+            Managers.Game.ItemCountText = $"{ExtraData / ItemData.spendEnergy}/{ItemData.maxEnergy / ItemData.spendEnergy}";
             Managers.Game.InfoAction = () => { Managers.UI.ShowPopupUI<UI_ItemInfo>().Init(ItemData); };
-            if (ExtraData >= _spendEnergy)
-            {
-                if (Utils.IsGreatestLevelOnCollection(ItemData))
-                {
-                    MergeEventHandler.Game.ItemActionButtonComponent.HideButton();
-                    MergeEventHandler.Game.AdsButtonComponent.HideButton();
-                }
-                else
-                {
-                    MergeEventHandler.Game.ItemActionButtonComponent.SetButton(ItemActionButton.ButtonType.TextCoin,
-                        "판매", $"{ItemData.coin / 10}");
-                }
-            }
-            else
-            {
-                if (Managers.CloudData.CurrentMergeAdsCount < Managers.Game.MaxMergeAdsCount)
-                    MergeEventHandler.Game.AdsButtonComponent.SetButton();
-                else
-                    MergeEventHandler.Game.AdsButtonComponent.HideButton();
-                MergeEventHandler.Game.ItemActionButtonComponent.SetButton(ItemActionButton.ButtonType.TextGem,
-                    "충전", $"{ItemData.gem}");
-            }
         }
 
         private void SellItem()
